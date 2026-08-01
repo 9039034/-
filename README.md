@@ -22,8 +22,8 @@
 
 | RAM | מה מומלץ להריץ |
 |-----|----------------|
-| 8 GB | מודל קטן בלבד (למשל `qwen3.5:3b`) — יעבוד, אבל איטי |
-| 16 GB | `qwen3.5:7b` — נקודת האיזון הטובה ביותר |
+| 8 GB | מודל קטן בלבד (למשל `qwen3:4b`) — יעבוד, אבל איטי |
+| 16 GB | `qwen3:8b` — נקודת האיזון הטובה ביותר |
 | 32 GB+ או GPU ייעודי | מודלים גדולים יותר (`deepseek-r1:14b`) וחלון קונטקסט ארוך |
 
 **כלל אצבע:** תריץ קודם מודל קטן אחד בצורה חלקה. רק אחר כך תשנה משתנה אחד בכל פעם (גודל מודל, קונטקסט, GPU).
@@ -131,13 +131,13 @@ docker compose up -d
 
 ```bash
 # מודל ראשי — נקודת איזון מצוינת ל-16GB RAM:
-docker exec -it ollama ollama pull qwen3.5:7b
+docker exec -it ollama ollama pull qwen3:8b
 ```
 
 אם יש לך פחות זיכרון, במקום זה:
 
 ```bash
-docker exec -it ollama ollama pull qwen3.5:3b
+docker exec -it ollama ollama pull qwen3:4b
 ```
 
 ## שלב 3 — משוך מודל embedding (הכרחי ל-RAG וחיפוש)
@@ -155,7 +155,7 @@ docker exec -it ollama ollama pull nomic-embed-text
 1. פתח דפדפן ולך אל: **http://localhost:3000**
 2. במסך הראשון — צור חשבון **Admin** מקומי (שם, אימייל, סיסמה).
    > החשבון הזה נשמר רק אצלך במחשב. זה לא נרשם לשום שירות ענן.
-3. אתה בפנים! בחר את המודל `qwen3.5:7b` מהתפריט למעלה ותוכל להתחיל לדבר.
+3. אתה בפנים! בחר את המודל `qwen3:8b` מהתפריט למעלה ותוכל להתחיל לדבר.
 
 ---
 
@@ -257,7 +257,7 @@ docker exec -it ollama ollama list
 |------|-------|
 | הצ'אט "ממציא" תשובות ולא משתמש במסמכים | חלון הקונטקסט קטן מדי — העלה ל-8192+ (חלק ה', סעיף 1) |
 | RAG/חיפוש לא עובדים | לא הגדרת מנוע embedding — ודא ש-`nomic-embed-text` מוגדר |
-| הכל איטי מאוד | המודל גדול מדי לזיכרון שלך — עבור למודל קטן יותר (`3b`) |
+| הכל איטי מאוד | המודל גדול מדי לזיכרון שלך — עבור למודל קטן יותר (`qwen3:4b`) |
 | `localhost:3000` לא נטען | ודא ששני הקונטיינרים רצים: `docker ps` |
 | חיפוש אינטרנט מחזיר כלום | ודא ש-DuckDuckGo נבחר וש-Web Search מופעל בצ'אט עצמו |
 
@@ -269,7 +269,7 @@ docker exec -it ollama ollama list
 1. התקן Docker
 2. צור תיקייה + קובץ docker-compose.yml
 3. docker compose up -d
-4. משוך מודל:      docker exec -it ollama ollama pull qwen3.5:7b
+4. משוך מודל:      docker exec -it ollama ollama pull qwen3:8b
 5. משוך embedding: docker exec -it ollama ollama pull nomic-embed-text
 6. פתח localhost:3000, צור חשבון admin
 7. הגדל קונטקסט ל-8192, הגדר embedding, הפעל web search
@@ -277,3 +277,11 @@ docker exec -it ollama ollama list
 ```
 
 **הכל חינם. הכל מקומי. הכל אצלך.**
+
+---
+
+> **נבדק בפועל:** ה-`docker-compose.yml` הורץ מקצה לקצה — שני הקונטיינרים עלו,
+> Open WebUI ענה על `/health`, נמשכו `qwen3:4b` ו-`nomic-embed-text`, בוצעה
+> הרצת צ'אט אמיתית, נוצר וקטור embedding, ו-Open WebUI זיהה את המודלים דרך
+> `OLLAMA_BASE_URL`. שמות המודלים במדריך אומתו מול הרישום של Ollama
+> (הגרסה `qwen3.5` שהופיעה קודם לא קיימת — התוקנה ל-`qwen3`).

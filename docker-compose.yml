@@ -1,0 +1,32 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ./ollama:/root/.ollama
+    restart: unless-stopped
+    # === יש לך GPU של NVIDIA? הסר את סימני ה-# מ-6 השורות הבאות ===
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    volumes:
+      - ./open-webui:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - "3000:8080"
+    environment:
+      - "OLLAMA_BASE_URL=http://ollama:11434"
+      # הפעלת חיפוש אינטרנט עם DuckDuckGo (חינם, בלי מפתח):
+      - "ENABLE_RAG_WEB_SEARCH=True"
+      - "RAG_WEB_SEARCH_ENGINE=duckduckgo"
+      - "RAG_WEB_SEARCH_RESULT_COUNT=3"
+    restart: unless-stopped
